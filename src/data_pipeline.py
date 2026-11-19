@@ -3,7 +3,7 @@
 Fontes utilizadas:
 - Yahoo Finance (`yfinance`): PETR4.SA (Close nominal ajustado a splits e Adj Close ajustado a dividendos),
   ^BVSP (Ibovespa) e BZ=F (Petróleo Brent a partir de jul/2007).
-- IPEADATA (arquivo local legado `data/raw/brent.xlsx`): Petróleo Brent diário para cobertura de 2000–2007.
+- IPEADATA (arquivo local `data/raw/brent.xlsx`): Petróleo Brent diário para cobertura de 2000–2007.
 - Banco Central do Brasil (API SGS):
   - Série 1: Taxa de câmbio PTAX USD/BRL (venda, diária).
   - Série 11: Taxa Selic diária (% a.d.).
@@ -134,7 +134,7 @@ def fetch_yfinance_b3_safe(
     return out
 
 
-def _load_legacy_brent(raw_dir: Path) -> pd.Series:
+def _load_historical_brent(raw_dir: Path) -> pd.Series:
     """Carrega a série histórica diária de Brent (IPEADATA) salva em `data/raw/brent.xlsx`."""
     brent_path = raw_dir / "brent.xlsx"
     if not brent_path.exists():
@@ -209,7 +209,7 @@ def build_datasets(
     bz_raw = fetch_yfinance_b3_safe("BZ=F", start_date="2007-07-01")
 
     # 2. Coleta Brent IPEADATA + BCB SGS
-    brent_ipea = _load_legacy_brent(raw_path)
+    brent_ipea = _load_historical_brent(raw_path)
     brent_full = bz_raw["Close"].combine_first(brent_ipea).sort_index()
 
     usd_brl_raw = fetch_bcb_sgs_chunked(1, start_year=2000)

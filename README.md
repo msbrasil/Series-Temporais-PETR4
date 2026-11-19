@@ -5,19 +5,19 @@
 [![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-F7931E?logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![Data Sources](https://img.shields.io/badge/Data-Yahoo%20Finance%20%7C%20IPEADATA%20%7C%20BCB%20SGS-2e7d32)](#arquitetura-e-pipeline-de-dados)
 
-> **Resumo Executivo:** Consolidação e reconstrução integral de um projeto acadêmico de Economia (UFPR, 2022) originalmente fragmentado em 8 notebooks exploratórios e um relatório técnico, transformado em um estudo **end-to-end de Econometria Financeira & Ciência de Dados** cobrindo **26 anos de mercado (jan/2000 – nov/2026)**.
+> **Resumo Executivo:** Estudo **end-to-end de Econometria Financeira, Séries Temporais e Machine Learning** aplicado às ações preferenciais da Petrobras (`PETR4`), cobrindo **26 anos de mercado (jan/2000 – nov/2026)** com pipeline causal de dados, detecção de quebras estruturais, modelagem multivariada e *backtesting Walk-Forward* sem *data leakage*.
 
 <details>
 <summary><strong>🇺🇸 English Executive Summary (Click to expand)</strong></summary>
 
 ### English Executive Summary
 
-This repository refactors and unifies a 2022 UFPR Economics time-series project (originally scattered across 8 exploratory notebooks and a report) into a reproducible **Financial Econometrics & Data Science** portfolio case study covering **PETR4 (Petrobras)** from **January 2000 to November 2026** (6,744 trading days; 321 closed months).
+This repository presents an end-to-end **Financial Econometrics & Data Science** case study analyzing **PETR4 (Petrobras)** from **January 2000 to November 2026** (6,744 trading days; 321 closed months).
 
 * **Causal Data Pipeline (`src/data_pipeline.py`):** Merges Yahoo Finance (`PETR4.SA`, `^BVSP`, `BZ=F`), historical IPEADATA Brent crude (`2000–2007`), and Brazil Central Bank SGS API series (`USD/BRL PTAX`, daily/target `Selic`), strictly aligned on B3 trading days with causal forward-fill only (zero look-ahead) and handling both split-adjusted screen price (`Close`) and dividend-reinvested total return (`Adj Close`).
-* **Structural Breaks & Dynamic CAPM (`src/econometrics.py`):** Fixes the broken 2022 Chow test via exact OLS F-statistics across 5 historical milestones (*Pre-Salt 2006*, *Subprime 2008*, *Pedro Parente / PPI 2016*, *COVID-19 2020*, *End of PPI 2023*), all statistically significant ($p < 10^{-19}$ multifactor; $p < 10^{-60}$ local log-price trajectory). Rolling CAPM reveals systematic risk surging to $\beta = 1.97$ during *Lava Jato* (2014–2016) and falling to $\beta = 0.64$ in the post-PPI dividend regime (2023–2026) as Brent sensitivity climbed to $0.32$.
+* **Structural Breaks & Dynamic CAPM (`src/econometrics.py`):** Implements exact OLS Chow F-tests across 5 historical milestones (*Pre-Salt 2006*, *Subprime 2008*, *Pedro Parente / PPI 2016*, *COVID-19 2020*, *End of PPI 2023*), all statistically significant ($p < 10^{-19}$ multifactor; $p < 10^{-60}$ local log-price trajectory). Rolling CAPM reveals systematic risk surging to $\beta = 1.97$ during *Lava Jato* (2014–2016) and falling to $\beta = 0.64$ in the post-PPI dividend regime (2023–2026) as Brent sensitivity climbed to $0.32$.
 * **Box-Jenkins & Multivariate VAR:** Formal ADF + KPSS unit-root testing, spurious correlation demonstration ($r = 0.85$ in levels vs. $r = 0.69$ in log-returns), `ARIMA(2,1,0)` residual diagnostics (Ljung-Box $p = 0.69$), and a `VAR(2)` model with economic Cholesky ordering (`Brent → USD/BRL → Ibovespa → PETR4`), attributing **25.9%** of PETR4 forecast error variance to Brent, **24.4%** to Ibovespa, **13.0%** to FX, and **36.8%** to idiosyncratic shocks.
-* **Leakage-Free Walk-Forward ML Benchmark (`src/ml_benchmark.py`):** Empirically exposes how K-Fold shuffling and contemporaneous predictors inflate $R^2$ from `-0.08` (causal $t-1$) to `+0.44` (leaked). Over a strict 48-month expanding Walk-Forward benchmark across 9 models, `VAR(1)` and `SARIMAX (t-1 exog)` achieve **72.9%** and **70.8%** directional accuracy while beating the Random Walk on price RMSE (`R$ 2.64` vs. `R$ 2.76`), and `HistGradientBoosting` attains the lowest price RMSE (`R$ 2.62`). Replaces the naive 2022 10-year static ARIMA point forecast with **12-month conditional macroeconomic scenarios**.
+* **Leakage-Free Walk-Forward ML Benchmark (`src/ml_benchmark.py`):** Empirically exposes how K-Fold shuffling and contemporaneous predictors inflate $R^2$ from `-0.08` (causal $t-1$) to `+0.44` (leaked). Over a strict 48-month expanding Walk-Forward benchmark across 9 models, `VAR(1)` and `SARIMAX (t-1 exog)` achieve **72.9%** and **70.8%** directional accuracy while beating the Random Walk on price RMSE (`R$ 2.64` vs. `R$ 2.76`), and `HistGradientBoosting` attains the lowest price RMSE (`R$ 2.62`). Conditional **12-month macroeconomic scenarios** quantify return expectations under stress, consensus, and commodity-boom regimes.
 
 </details>
 
@@ -25,7 +25,7 @@ This repository refactors and unifies a 2022 UFPR Economics time-series project 
 
 ## Sumário
 
-1. [Evolução do Projeto: De 2022 (UFPR) para 2026 (Portfólio)](#evolução-do-projeto-de-2022-ufpr-para-2026-portfólio)
+1. [Escopo Metodológico — Os 5 Atos da Análise](#escopo-metodológico--os-5-atos-da-análise)
 2. [Arquitetura do Repositório e Pipeline de Dados](#arquitetura-do-repositório-e-pipeline-de-dados)
 3. [Ato 1 — Trajetória Histórica, Dividendos e Volatilidade (2000–2026)](#ato-1--trajetória-histórica-dividendos-e-volatilidade-20002026)
 4. [Ato 2 — CAPM Dinâmico, Modelo Multifatorial e Teste F de Chow](#ato-2--capm-dinâmico-modelo-multifatorial-e-teste-f-de-chow)
@@ -36,20 +36,17 @@ This repository refactors and unifies a 2022 UFPR Economics time-series project 
 
 ---
 
-## Evolução do Projeto: De 2022 (UFPR) para 2026 (Portfólio)
+## Escopo Metodológico — Os 5 Atos da Análise
 
-Em 2022, o estudo original da disciplina de Séries Temporais na UFPR foi produzido em 8 notebooks separados (`Séries Temporais.ipynb`, `an-lise-petr4-petrobras.ipynb`, `main.ipynb`, `series-temporais-python.ipynb`, `var.ipynb`, `vectorAR.ipynb`, `TimeSeries_Exemplos.ipynb` e `Time Series Forecasting with ARIMA.IPYNB`) e um relatório markdown (`4º Relatório - Séries Temporais.md`), todos preservados em [`archive/legacy_2022/`](archive/legacy_2022/).
+A investigação completa está estruturada no notebook [`PETR4_Time_Series_Analysis.ipynb`](PETR4_Time_Series_Analysis.ipynb), apoiado por módulos reutilizáveis em [`src/`](src/):
 
-Na reconstrução unificada em [`PETR4_Time_Series_Analysis.ipynb`](PETR4_Time_Series_Analysis.ipynb) e nos módulos em [`src/`](src/), resolvemos as principais lacunas técnicas da versão de 2022:
-
-| Aspecto | Versão Acadêmica (2022) | Versão Reconstruída (2026) |
+| Ato | Pilar Analítico | Técnicas e Entregas Principais |
 | :--- | :--- | :--- |
-| **Cobertura Temporal** | Jan/2000 – Ago/2022 | **Jan/2000 – Nov/2026** (6.744 pregões diários / 321 meses fechados) |
-| **Variável-Alvo** | Mistura inconsistente entre `Close` e `Adj Close` | **Abordagem dupla:** `Close` (leitura histórica) + `Adj Close` (retorno total com dividendos para modelagem) |
-| **Teste de Chow** | Prometido no relatório, falhou no código (`#sem jeito =(`) | **Implementação exata via OLS (`statsmodels`)** nos 5 choques + curva rolante estilo Quandt-Andrews |
-| **CAPM** | $\beta$ estático único sem erros robustos | **CAPM + Multifatorial (Brent + USD/BRL)** com erros **HAC Newey-West** e **Beta Rolante (252d)** |
-| **Modelagem Multivariada** | Tentativa inacabada de `VAR` e `SARIMAX` sem exógenas | **VAR(2)** com ordenação Cholesky econômica, **Granger, IRF e FEVD** + **SARIMAX causal ($t-1$)** |
-| **Previsão & ML** | ARIMA estático de 10 anos (R$ 34,86) e ML com *data leakage* | **Prova empírica de Data Leakage**, **Walk-Forward (9 modelos)** sem vazamento e **Cenários Macro (12m)** |
+| **1** | **História Econômica & Regimes de Volatilidade** | Pipeline diário e mensal (**jan/2000 – nov/2026**: 6.744 pregões / 321 meses), separação `Close` (tela) vs. `Adj Close` (retorno total com dividendos) e análise dos 5 marcos estruturais |
+| **2** | **CAPM Dinâmico & Teste F de Chow** | CAPM e modelo multifatorial (**Ibovespa + Brent + USD/BRL**) com erros **HAC Newey-West**, **Beta Rolante (252d)** e **Teste F de Chow** pontual e rolante (estilo Quandt-Andrews) |
+| **3** | **Estocástica & Estacionariedade** | Demonstração de **Correlação Espúria** (níveis vs. retornos), simulação **Passeio Aleatório vs. Ruído Branco**, bateria **ADF + KPSS** e painéis **ACF/PACF** |
+| **4** | **Econometria Univariada & Multivariada** | Seleção Box-Jenkins **`ARIMA(2,1,0)`** com diagnóstico Ljung-Box/Jarque-Bera e **`VAR(2)`** com ordenação Cholesky econômica, **Causalidade de Granger, IRF e FEVD** |
+| **5** | **ML Benchmark, Data Leakage & Cenários** | Prova empírica de **Data Leakage**, *backtesting* **Walk-Forward** (9 modelos causais) e **Simulação de Cenários Macroeconômicos (12m)** com intervalos de confiança |
 
 ---
 
@@ -70,8 +67,7 @@ Series Temporais PETR4/
 │   └── processed/
 │       ├── petr4_macro_daily.csv              # 6.744 pregões (2000-01-05 a 2026-11-17)
 │       └── petr4_macro_monthly.csv            # 321 meses fechados (2000-02-29 a 2026-10-31)
-├── reports/figures/                           # 9 gráficos PNG em alta resolução
-└── archive/legacy_2022/                       # Preservação histórica dos 8 notebooks e relatório de 2022
+└── reports/figures/                           # 9 gráficos PNG em alta resolução
 ```
 
 **Destaques de Engenharia de Dados em [`src/data_pipeline.py`](src/data_pipeline.py):**
@@ -208,4 +204,4 @@ python -m src.data_pipeline
 jupyter lab PETR4_Time_Series_Analysis.ipynb
 ```
 
-> **Nota sobre isenção financeira:** Este projeto tem finalidade estritamente acadêmica, econométrica e demonstrativa de ciência de dados, não constituindo recomendação de compra ou venda de ativos mobiliários.
+> **Nota sobre isenção financeira:** Este projeto tem finalidade estritamente educacional, econométrica e demonstrativa de ciência de dados, não constituindo recomendação de compra ou venda de ativos mobiliários.
